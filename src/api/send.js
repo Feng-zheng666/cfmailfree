@@ -62,6 +62,35 @@ export async function handleSendApi(request, db, url, path, options) {
   };
   const hasAnyKey = !!(RESEND_API_KEY || SENDFLARE_API_KEY || CYBERPERSONS_API_KEY);
 
+  // 收件人历史：返回某个发件人最近使用的收件人列表（去重，最多 N 条）
+  if (path === '/api/recipient-history' && request.method === 'GET') {
+    if (isMock) return Response.json([]);
+    const from = url.searchParams.get('from') || '';
+    if (!from) return errorResponse('缺少 from 参数', 400);
+
+    try {
+      if (!isStrictAdmin(request, options)) {
+        const access = await getMailboxAccess(db, request, options, { address: from });
+        if (access.exists && !access.allowed) return errorResponse('Forbidden', 403);
+        if (!access.exists) return Response.json([]);
+      }
+
+      const limit = Math.min(parseInt(url.searchParams.get('limit') || '5', 10), 20);
+      const { results } = await db.prepare(`
+        SELECT to_addrs as recipient
+        FROM sent_emails
+        WHERE from_addr = ?
+        GROUP BY to_addrs
+        ORDER BY MAX(created_at) DESC
+        LIMIT ?
+      `).bind(String(from).trim().toLowerCase(), limit).all();
+      return Response.json((results || []).map(r => r.recipient));
+    } catch (e) {
+      console.error('查询收件人历史失败:', e);
+      return errorResponse('查询收件人历史失败', 500);
+    }
+  }
+
   if (path === '/api/sent' && request.method === 'GET') {
     if (isMock) return Response.json([]);
     const from = url.searchParams.get('from') || url.searchParams.get('mailbox') || '';
