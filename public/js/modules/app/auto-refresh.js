@@ -6,8 +6,8 @@
 // 自动刷新状态
 let autoRefreshInterval = null;
 let isAutoRefreshEnabled = true;
-const AUTO_REFRESH_INTERVAL = 1000; // 1秒 tick，实际刷新由回调内部的倒计时控制
-const REAL_REFRESH_INTERVAL = 15000; // 实际刷新周期，用于可见性恢复判断
+const AUTO_REFRESH_INTERVAL = 15000; // 15 秒直接刷新
+const REAL_REFRESH_INTERVAL = 15000; // 实际刷新周期，与 interval 一致
 
 // 页面可见性追踪
 let isPageVisible = true;

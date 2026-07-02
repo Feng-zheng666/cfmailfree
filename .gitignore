@@ -1,0 +1,20 @@
+# Wrangler 状态（含部署日志、本地 session token 等绝对不应提交）
+.wrangler/
+
+# 依赖
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# 本地环境变量（如果创建 .env 文件）
+.env
+.env.local

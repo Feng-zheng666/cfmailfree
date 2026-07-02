@@ -79,11 +79,9 @@ initSessionFromCache();
 const showToast = window.showToast || ((msg, type) => console.log(`[${type}] ${msg}`));
 
 // 刷新状态
-const REFRESH_INTERVAL = 15;
-let countdown = REFRESH_INTERVAL;
 function showHeaderLoading(t) { if (els.listLoading) { els.listLoading.innerHTML = `<span class="spinner"></span>${t || '加载中…'}`; els.listLoading.style.display = 'flex'; }}
 function hideHeaderLoading() { if (els.listLoading) els.listLoading.style.display = 'none'; }
-function showCountdown() { if (els.listLoading) { els.listLoading.innerHTML = `<span class="countdown-icon">⏱</span>${countdown}s 后刷新`; els.listLoading.style.display = 'flex'; }}
+function showRefreshIdle() { if (els.listLoading) { els.listLoading.innerHTML = `<span class="countdown-icon">⏱</span>自动刷新中`; els.listLoading.style.display = 'flex'; }}
 
 // 刷新邮件列表
 async function refresh() {
@@ -111,10 +109,10 @@ async function refresh() {
     if (!isSentViewActive()) prefetchEmails(emails, api);
     markViewLoaded();
   } catch (_) {}
-  finally { hideHeaderLoading(); if (getCurrentMailbox()) { countdown = REFRESH_INTERVAL; showCountdown(); } }
+  finally { hideHeaderLoading(); if (getCurrentMailbox()) { showRefreshIdle(); } }
 }
 
-function autoRefreshCallback() { if (countdown > 0) { countdown--; showCountdown(); if (countdown <= 0) refresh().finally(() => { countdown = REFRESH_INTERVAL; showCountdown(); }); }}
+function autoRefreshCallback() { showRefreshIdle(); refresh().finally(() => { showRefreshIdle(); }); }
 
 // 加载邮箱列表
 async function loadMailboxes(opts = {}) {
