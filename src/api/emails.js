@@ -117,7 +117,6 @@ export async function handleEmailsApi(request, db, url, path, options) {
       }
 
       const filter = mailboxOnlyTimeFilter(isMailboxOnly);
-      const placeholders = ids.map(() => '?').join(',');
       try {
         const { results } = await db.prepare(`
           SELECT id, sender, to_addrs, subject, verification_code, preview, r2_bucket, r2_object_key, received_at, is_read
