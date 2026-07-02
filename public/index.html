@@ -20,12 +20,7 @@
       }
     </style>
 
-    <link rel="stylesheet" href="/css/app.css" />
-    <link rel="stylesheet" href="/css/app-sidebar.css" />
-    <link rel="stylesheet" href="/css/app-mailbox.css" />
-    <link rel="stylesheet" href="/css/app-compose.css" />
-    <link rel="stylesheet" href="/css/app-modal.css" />
-    <link rel="stylesheet" href="/css/app-responsive.css" />
+    <link rel="stylesheet" href="/css/app-bundle.css" />
     <link rel="stylesheet" href="/css/app-mobile.css" media="(max-width: 900px)" />
     <!-- 暗黑模式样式 -->
     <!-- 主题切换支持 -->
@@ -33,14 +28,11 @@
 
     <!-- SVG Icons Sprite (Replace Emoji Icons) -->
     <link rel="preload" href="/icons/sprites.svg" as="image" type="image/svg+xml" crossorigin>
-    <script src="/js/toast-utils.js"></script>
-    <script src="/js/mock.js"></script>
+    <script src="/js/core.js" defer></script>
     <!-- 提前内联保存 hash，保证最早阶段即可保留路由信息 -->
     <script>
       try{ if (location.hash){ sessionStorage.setItem('mf:preservedHash', location.hash); } }catch(_){ }
     </script>
-    <script src="/js/auth-guard.js"></script>
-    <script src="/js/app-router.js" defer></script>
   </head>
   <body>
     <!-- SVG Icon Sprites -->

@@ -62,7 +62,7 @@ router.get('/', async (c) => {
     const text = await resp.text();
     return new Response(
       text.replace('<meta name="mail-domains" content="">', `<meta name="mail-domains" content="${domains.join(',')}">`),
-      { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0' } }
+      { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'public, max-age=3600' } }
     );
   } catch (_) { return resp; }
 });
