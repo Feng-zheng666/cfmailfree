@@ -3,7 +3,7 @@
  * @module api/emails
  */
 
-import { getMailboxAccess, getMessageAccess, errorResponse } from './helpers.js';
+import { getMailboxAccess, getMessageAccess, getAuthContext, errorResponse } from './helpers.js';
 import { buildMockEmails, buildMockEmailDetail } from './mock.js';
 import { extractEmail } from '../utils/common.js';
 import { getMailboxIdByAddress } from '../db/index.js';
@@ -92,9 +92,28 @@ export async function handleEmailsApi(request, db, url, path, options) {
       if (ids.length > 50) return errorResponse('单次最多查询50封邮件', 400);
       if (isMock) return Response.json(ids.map(id => buildMockEmailDetail(id)));
 
-      for (const id of ids) {
-        const access = await getMessageAccess(db, request, options, id);
-        if (access.exists && !access.allowed) return errorResponse('Forbidden', 403);
+      const placeholders = ids.map(() => '?').join(',');
+      const { results: messages } = await db.prepare(
+        `SELECT id, mailbox_id FROM messages WHERE id IN (${placeholders})`
+      ).bind(...ids).all();
+      if (!messages || messages.length === 0) return errorResponse('邮件不存在', 404);
+
+      const ctx = getAuthContext(request, options);
+      if (ctx.strictAdmin) {
+        // 管理员可访问所有邮件，跳过鉴权
+      } else if (ctx.role === 'mailbox') {
+        const userMailboxId = ctx.mailboxId;
+        const allOwned = messages.every(m => Number(m.mailbox_id) === userMailboxId);
+        if (!allOwned) return errorResponse('Forbidden', 403);
+      } else if (ctx.userId) {
+        const uniqueIds = [...new Set(messages.map(m => m.mailbox_id))];
+        const ownedRes = await db.prepare(
+          `SELECT DISTINCT mailbox_id FROM user_mailboxes WHERE user_id = ? AND mailbox_id IN (${uniqueIds.map(() => '?').join(',')})`
+        ).bind(ctx.userId, ...uniqueIds).all();
+        const ownedSet = new Set((ownedRes.results || []).map(r => r.mailbox_id));
+        if (!uniqueIds.every(id => ownedSet.has(id))) return errorResponse('Forbidden', 403);
+      } else {
+        return errorResponse('Forbidden', 403);
       }
 
       const filter = mailboxOnlyTimeFilter(isMailboxOnly);

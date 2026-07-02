@@ -94,6 +94,7 @@
                   .then(function(s){
                     if (!s) return; 
                     if (s.role === 'mailbox') { window.location.replace('/html/mailbox.html'); return; }
+                    try{ sessionStorage.setItem('mf:session', JSON.stringify({ ts: Date.now(), data: s })); }catch(_){ }
                     try{ sessionStorage.setItem('auth_checked','true'); sessionStorage.setItem('auth_checked_ts', String(Date.now())); }catch(_){ }
                     // 加载应用
                     var s1=document.createElement('script'); s1.type='module'; s1.src='/js/app.js'; document.body.appendChild(s1);
@@ -127,6 +128,7 @@
                 if (r && r.ok){
                   return r.json().then(function(s){
                     if (s && s.role === 'mailbox') { window.location.replace('/html/mailbox.html'); return null; }
+                    if (s) { try{ sessionStorage.setItem('mf:session', JSON.stringify({ ts: Date.now(), data: s })); }catch(_){ } }
                     return s;
                   });
                 } else {
@@ -178,6 +180,7 @@
                 if (r && r.ok){
                   return r.json().then(function(s){
                     if (s && s.role === 'mailbox') { window.location.replace('/html/mailbox.html'); return null; }
+                    if (s) { try{ sessionStorage.setItem('mf:session', JSON.stringify({ ts: Date.now(), data: s })); }catch(_){ } }
                     return s;
                   });
                 } else {

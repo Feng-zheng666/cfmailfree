@@ -109,12 +109,27 @@ export function initSessionFromCache() {
  * @returns {Promise<object|null>}
  */
 export async function validateSession() {
+  // 优先从 sessionStorage 读取最近缓存的会话，避免重复调用 /api/session
+  try {
+    const raw = sessionStorage.getItem('mf:session');
+    if (raw) {
+      const { ts, data } = JSON.parse(raw);
+      if (data && Date.now() - ts < 5000) {
+        setCurrentUserKey(`${data.role || ''}:${data.username || ''}`);
+        setSession(data);
+        applySessionUI(data);
+        return data;
+      }
+    }
+  } catch(_) {}
+
   try {
     const r = await fetch('/api/session');
     if (!r.ok) {
       return null;
     }
     const s = await r.json();
+    try { sessionStorage.setItem('mf:session', JSON.stringify({ ts: Date.now(), data: s })); } catch(_) {}
     cacheSet('session', s);
     setCurrentUserKey(`${s.role || ''}:${s.username || ''}`);
     setSession(s);

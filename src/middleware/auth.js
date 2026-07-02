@@ -188,7 +188,7 @@ async function pbkdf2Hash(password) {
   const encoder = new TextEncoder();
   const key = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
   const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+    { name: 'PBKDF2', salt, iterations: 60000, hash: 'SHA-256' },
     key, 256
   );
   const saltB64 = btoa(String.fromCharCode(...salt));
@@ -216,7 +216,7 @@ export async function verifyPassword(rawPassword, stored) {
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey('raw', encoder.encode(rawPassword), 'PBKDF2', false, ['deriveBits']);
       const bits = await crypto.subtle.deriveBits(
-        { name: 'PBKDF2', salt, iterations: 100000, hash: 'SHA-256' },
+        { name: 'PBKDF2', salt, iterations: 60000, hash: 'SHA-256' },
         key, 256
       );
       const actualHash = new Uint8Array(bits);

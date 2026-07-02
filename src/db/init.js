@@ -72,6 +72,8 @@ async function performFirstTimeSetup(db) {
 async function createIndexes(db) {
   await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_address ON mailboxes(address);`);
   await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_is_pinned ON mailboxes(is_pinned DESC);`);
+  await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_domain ON mailboxes(domain);`);
+  await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_can_login ON mailboxes(can_login);`);
   await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_address_created ON mailboxes(address, created_at DESC);`);
   await db.exec(`CREATE INDEX IF NOT EXISTS idx_mailboxes_is_favorite ON mailboxes(is_favorite DESC);`);
   await db.exec(`CREATE INDEX IF NOT EXISTS idx_messages_mailbox_received ON messages(mailbox_id, received_at DESC);`);
